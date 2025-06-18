@@ -77,7 +77,9 @@ public class Camera extends JPanel {
         g.drawString(String.format("fps: %.2f", 1 / Script.deltaTime), 5, 15);
         g.drawString(String.format("%s%s%s",
                 shaderOverride ? "shaderOverride " : "", showOverdraw ? "showOverdraw " : "", shaderStatus ? "shaderStatus " : ""), 5, 30);
-        if (shaderStatus) {
+        if (shaderOverride) {
+            g.drawString(Scene.camera.mat.shader.getClass().getSimpleName(), 5, 50);
+        } else if (shaderStatus) {
             g.drawString("white - regular return", 5, 50);
             g.drawString("red   - discarded fragment", 5, 65);
         }
