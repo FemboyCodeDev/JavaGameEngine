@@ -28,8 +28,8 @@ public class Texture {
     }
 
     public Float3 sample(Float2 uv) {
-        int x = Math.min((int) (uv.x * width), width - 1);
-        int y = Math.min((int) (uv.y * height), height - 1);
+        int x = Maths.clamp(0, width - 1, (int) (uv.x * width));
+        int y = Maths.clamp(0, height - 1, (int) (uv.y * height));
         return Maths.colorVector(texture.getRGB(x, y));
     }
 
