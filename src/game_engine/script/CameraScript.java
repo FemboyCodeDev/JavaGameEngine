@@ -41,14 +41,16 @@ public class CameraScript extends Script {
         } else if (Input.keyDown(KeyEvent.VK_1)) {
             Scene.camera.mat.shader = new UnlitShader();
         } else if (Input.keyDown(KeyEvent.VK_2)) {
-            Scene.camera.mat.shader = new DepthShader();
+            Scene.camera.mat.shader = new WireframeShader();
         } else if (Input.keyDown(KeyEvent.VK_3)) {
-            Scene.camera.mat.shader = new WeightsShader();
+            Scene.camera.mat.shader = new DepthShader();
         } else if (Input.keyDown(KeyEvent.VK_4)) {
-            Scene.camera.mat.shader = new UVShader();
+            Scene.camera.mat.shader = new WeightsShader();
         } else if (Input.keyDown(KeyEvent.VK_5)) {
-            Scene.camera.mat.shader = new NormalsShader();
+            Scene.camera.mat.shader = new UVShader();
         } else if (Input.keyDown(KeyEvent.VK_6)) {
+            Scene.camera.mat.shader = new NormalsShader();
+        } else if (Input.keyDown(KeyEvent.VK_7)) {
             Scene.camera.mat.shader = new DebugShader();
         }
 
