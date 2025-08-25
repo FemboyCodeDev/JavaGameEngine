@@ -20,6 +20,6 @@ public class Material {
     }
 
     public Float2 convertUV(Float2 uv) {
-        return uv.multiply(scale).modulo(1f);
+        return uv.multiply(scale);
     }
 }

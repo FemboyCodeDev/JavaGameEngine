@@ -13,6 +13,6 @@ public abstract class Shader {
 
     protected static float getLightingIntensity(Float3 normal) {
         float intensity = (Maths.dotProduct(normal, Scene.dirToSun) + 1f) * .5f;
-        return (intensity * (1f - Scene.envLight)) + Scene.envLight;
+        return Maths.lerp(intensity, 1f, Scene.envLight);
     }
 }

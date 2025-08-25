@@ -18,13 +18,16 @@ public class Float2 {
         y += dy;
     }
     public void offset(Float2 f2) {
-        offset(f2.x, f2.y);
+        this.offset(f2.x, f2.y);
     }
 
     public double length() {
         return Math.sqrt(x * x + y * y);
     }
 
+    public Float2 rotate90() {
+        return new Float2(y, -x);
+    }
     public Float2 add(Float2 f2) {
         return new Float2(x + f2.x, y + f2.y);
     }
@@ -37,9 +40,6 @@ public class Float2 {
     public Float2 multiply(Float2 f2) {
         return new Float2(x * f2.x, y * f2.y);
     }
-    public Float2 rotate90() {
-        return new Float2(y, -x);
-    }
     public Float2 inverse() {
         return new Float2(1 / x, 1 / y);
     }
@@ -47,8 +47,11 @@ public class Float2 {
         return new Float2(x % v, y % v);
     }
     public Float2 normalize() {
-        double length = length();
-        return (length == 0d) ? new Float2() : scale(1 / length);
+        double length = this.length();
+        return (length == 0d) ? new Float2() : this.scale(1 / length);
+    }
+    public Float2 lerp(Float2 f2, float t) {
+        return this.scale(1f - t).add(f2.scale(t));
     }
 
     public Float3 to3D() {

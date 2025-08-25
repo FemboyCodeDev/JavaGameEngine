@@ -33,8 +33,8 @@ public class Maths {
         return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
     }
 
-    public static Float3 lerp(Float3 A, Float3 B, float t) {
-        return A.scale(1f - t).add(B.scale(t));
+    public static float lerp(float a, float b, float t) {
+        return a * (1f - t) + b * t;
     }
 
     public static float signedTriArea(Float2 a, Float2 b, Float2 c) {
@@ -42,23 +42,18 @@ public class Maths {
         Float2 abNormal = b.sub(a).rotate90();
         return dotProduct(ac, abNormal) / 2f;
     }
-    public static Pair<Boolean, Float3> getTriWeights(Float2 a, Float2 b, Float2 c, Float2 p) {
+    public static Pair<Boolean, Float3> pointTriangleTest(Float2 a, Float2 b, Float2 c, Float2 p) {
         float areaABP = signedTriArea(a, b, p);
         float areaBCP = signedTriArea(b, c, p);
         float areaCAP = signedTriArea(c, a, p);
+        boolean inTriangle = ((areaABP >= 0f) == (areaBCP >= 0f)) && ((areaABP >= 0f) == (areaCAP >= 0f));
 
         float totalArea = areaABP + areaBCP + areaCAP;
         float invTotalArea = 1f / totalArea;
         float A = areaBCP * invTotalArea;
         float B = areaCAP * invTotalArea;
         float C = areaABP * invTotalArea;
-        return new Pair<>(totalArea != 0f, new Float3(A, B, C));
-    }
-    public static boolean isPointInTriangle(Float2 a, Float2 b, Float2 c, Float2 p) {
-        boolean ab = (signedTriArea(a, b, p) >= 0f);
-        boolean bc = (signedTriArea(b, c, p) >= 0f);
-        boolean ca = (signedTriArea(c, a, p) >= 0f);
-        return (ab == bc) && (ab == ca);
+        return new Pair<>(inTriangle && (totalArea != 0f), new Float3(A, B, C));
     }
 
     public static Float3 vertexToView(Float3 vertex, Transform camTransform) {
@@ -139,12 +134,5 @@ public class Maths {
         Float3 B = transform(tri[1], transform);
         Float3 C = transform(tri[2], transform);
         return new Float3[]{A, B, C};
-    }
-
-    public static Float3 colorVector(int color) {
-        int r = (color & 0xff0000) >> 16;
-        int g = (color & 0x00ff00) >> 8;
-        int b = (color & 0x0000ff);
-        return new Float3(r / 255f, g / 255f, b / 255f);
     }
 }

@@ -44,7 +44,7 @@ public class Main {
     private static void setupMatTextures(Material quad, Material cube) {
         Texture quadTex = new Texture(16, 16);
         quad.tex = quadTex;
-        quadTex.fill(0, 0, 16, 16, 0x5f5f5f);
+        quadTex.fill(0x5f5f5f);
         quadTex.fill(0, 0, 8, 8, 0x7f7f7f);
         quadTex.fill(8, 8, 8, 8, 0x7f7f7f);
 

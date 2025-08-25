@@ -20,22 +20,24 @@ public class Texture {
 
         int halfWidth = width / 2;
         int halfHeight = height / 2;
-        g.setColor(Color.DARK_GRAY);
-        g.fillRect(0, 0, width, height);
-        g.setColor(Color.MAGENTA);
-        g.fillRect(0, 0, halfWidth, halfHeight);
-        g.fillRect(halfWidth, halfHeight, halfWidth, halfHeight);
+        this.fill(0x3f3f3f);
+        this.fill(0, 0, halfWidth, halfHeight, 0xff00ff);
+        this.fill(halfWidth, halfHeight, halfWidth, halfHeight, 0xff00ff);
     }
 
     public Float3 sample(Float2 uv) {
+        uv = uv.modulo(1f);
         int x = Maths.clamp(0, width - 1, (int) (uv.x * width));
         int y = Maths.clamp(0, height - 1, (int) (uv.y * height));
-        return Maths.colorVector(texture.getRGB(x, y));
+        return new Float3(texture.getRGB(x, y));
     }
 
     public void clear() {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, width, height);
+    }
+    public void fill(int color) {
+        this.fill(0, 0, width, height, color);
     }
     public void fill(int x, int y, int width, int height, int color) {
         g.setColor(new Color(color));

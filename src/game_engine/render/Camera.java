@@ -28,7 +28,7 @@ public class Camera extends JPanel {
     private static final Float3 OVER_OVERDRAW_COLOR = new Float3(1f, .6f, .6f);
     public static boolean shaderStatus = false;
     private static final Float3 SHADER_RETURN = new Float3(1f, 1f, 1f);
-    private static final Float3 SHADER_DISCARD = new Float3(.8f, 0f, .2f);
+    private static final Float3 SHADER_DISCARD = new Float3(1f, 0f, 0f);
 
     public static float fov;
     private static int resX;
@@ -120,11 +120,11 @@ public class Camera extends JPanel {
 
                     float fracA = (NEAR_CLIP_DST - clippedP.z) / (A.z - clippedP.z);
                     float fracB = (NEAR_CLIP_DST - clippedP.z) / (B.z - clippedP.z);
-                    Float3 clipPointA = Maths.lerp(clippedP, A, fracA);
-                    Float3 clipPointB = Maths.lerp(clippedP, B, fracB);
+                    Float3 clipPointA = clippedP.lerp(A, fracA);
+                    Float3 clipPointB = clippedP.lerp(B, fracB);
 
-                    Float3 weightA = Maths.lerp(STANDARD_WEIGHTS[clipIndex], STANDARD_WEIGHTS[nextI], fracA);
-                    Float3 weightB = Maths.lerp(STANDARD_WEIGHTS[clipIndex], STANDARD_WEIGHTS[prevI], fracB);
+                    Float3 weightA = STANDARD_WEIGHTS[clipIndex].lerp(STANDARD_WEIGHTS[nextI], fracA);
+                    Float3 weightB = STANDARD_WEIGHTS[clipIndex].lerp(STANDARD_WEIGHTS[prevI], fracB);
                     Float3[] weights1 = new Float3[]{STANDARD_WEIGHTS[nextI], STANDARD_WEIGHTS[prevI], weightB};
                     Float3[] weights2 = new Float3[]{STANDARD_WEIGHTS[nextI], weightA, weightB};
 
@@ -141,11 +141,11 @@ public class Camera extends JPanel {
 
                     float fracX = (NEAR_CLIP_DST - P.z) / (clippedA.z - P.z);
                     float fracY = (NEAR_CLIP_DST - P.z) / (clippedB.z - P.z);
-                    Float3 clipPointX = Maths.lerp(P, clippedA, fracX);
-                    Float3 clipPointY = Maths.lerp(P, clippedB, fracY);
+                    Float3 clipPointX = P.lerp(clippedA, fracX);
+                    Float3 clipPointY = P.lerp(clippedB, fracY);
 
-                    Float3 weightX = Maths.lerp(STANDARD_WEIGHTS[nonClipI], STANDARD_WEIGHTS[clipIA], fracX);
-                    Float3 weightY = Maths.lerp(STANDARD_WEIGHTS[nonClipI], STANDARD_WEIGHTS[clipIB], fracY);
+                    Float3 weightX = STANDARD_WEIGHTS[nonClipI].lerp(STANDARD_WEIGHTS[clipIA], fracX);
+                    Float3 weightY = STANDARD_WEIGHTS[nonClipI].lerp(STANDARD_WEIGHTS[clipIB], fracY);
                     Float3[] weights = new Float3[]{STANDARD_WEIGHTS[nonClipI], weightX, weightY};
 
                     drawTriangle(triToScreen(P, clipPointX, clipPointY), weights, worldNormal, UVs, mat);
@@ -173,43 +173,41 @@ public class Camera extends JPanel {
         for (int y = startY; y < endY; y++) {
             for (int x = startX; x < endX; x++) {
                 Float2 p = new Float2(x, y);
-                if (Maths.isPointInTriangle(a, b, c, p)) {
-                    Pair<Boolean, Float3> pointWeights = Maths.getTriWeights(a, b, c, p);
-                    if (pointWeights.a) {
-                        float depth = (1 / Maths.dotProduct(pointWeights.b, depths.inverse()));
-                        if (showOverdraw || (depth < depthBuffer[x][y])) {
-                            Float2 screenUV = new Float2(x / ((float) resX), y / ((float) resY));
-                            Float3 weights = (triWeights[0].scale(pointWeights.b.x / depths.x)
-                                    .add(triWeights[1].scale(pointWeights.b.y / depths.y))
-                                    .add(triWeights[2].scale(pointWeights.b.z / depths.z))).scale(depth);
-                            Float2 texUV = mat.convertUV(UVs[0].scale(weights.x).add(UVs[1].scale(weights.y)).add(UVs[2].scale(weights.z)));
-                            Float3 shaderCol = new Float3(1f, 0f, 1f);
+                Pair<Boolean, Float3> triTest = Maths.pointTriangleTest(a, b, c, p);
+                if (triTest.a) {
+                    float depth = 1f / Maths.dotProduct(triTest.b, depths.inverse());
+                    if (showOverdraw || (depth < depthBuffer[x][y])) {
+                        Float2 screenUV = new Float2(x / ((float) resX), y / ((float) resY));
+                        Float3 weights = (triWeights[0].scale(triTest.b.x / depths.x)
+                                .add(triWeights[1].scale(triTest.b.y / depths.y))
+                                .add(triWeights[2].scale(triTest.b.z / depths.z))).scale(depth);
+                        Float2 texUV = mat.convertUV(UVs[0].scale(weights.x).add(UVs[1].scale(weights.y)).add(UVs[2].scale(weights.z)));
+                        Float3 shaderCol = new Float3(1f, 0f, 1f);
 
-                            Shader shader = shaderOverride ? Scene.camera.mat.shader : mat.shader;
-                            if (shader != null) {
-                                Texture tex = (mat.tex == null) ? Scene.errorMat.tex : mat.tex;
-                                shaderCol = shader.fragment(tex, texUV, worldNormal, depth, weights, screenUV);
+                        Shader shader = shaderOverride ? Scene.camera.mat.shader : mat.shader;
+                        if (shader != null) {
+                            Texture tex = (mat.tex == null) ? Scene.errorMat.tex : mat.tex;
+                            shaderCol = shader.fragment(tex, texUV, worldNormal, depth, weights, screenUV);
 
-                                if (shaderStatus) {
-                                    if (shaderCol.x < 0f) shaderCol = SHADER_DISCARD;
-                                    else shaderCol = SHADER_RETURN;
-                                } else {
-                                    if (shaderCol.x < 0f) continue;
-                                }
+                            if (shaderStatus) {
+                                if (shaderCol.x < 0f) shaderCol = SHADER_DISCARD;
+                                else shaderCol = SHADER_RETURN;
+                            } else {
+                                if (shaderCol.x < 0f) continue;
                             }
-
-                            if (showOverdraw) {
-                                depth = depthBuffer[x][y];
-                                if (depth == Float.MAX_VALUE) {
-                                    depth = 1f;
-                                } else {
-                                    depth += 1f;
-                                }
-                                shaderCol = (depth > OVERDRAW_LIMIT) ? OVER_OVERDRAW_COLOR : (new Float3(depth, depth, depth).scale(1 / OVERDRAW_LIMIT));
-                            }
-                            renderBuffer.setRGB(x, y, shaderCol.getColor());
-                            depthBuffer[x][y] = depth;
                         }
+
+                        if (showOverdraw) {
+                            depth = depthBuffer[x][y];
+                            if (depth == Float.MAX_VALUE) {
+                                depth = 1f;
+                            } else {
+                                depth += 1f;
+                            }
+                            shaderCol = (depth > OVERDRAW_LIMIT) ? OVER_OVERDRAW_COLOR : (new Float3(depth, depth, depth).scale(1 / OVERDRAW_LIMIT));
+                            }
+                        renderBuffer.setRGB(x, y, shaderCol.getColor());
+                        depthBuffer[x][y] = depth;
                     }
                 }
             }

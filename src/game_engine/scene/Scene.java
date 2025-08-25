@@ -2,7 +2,6 @@ package game_engine.scene;
 
 import game_engine.material.Material;
 import game_engine.material.Texture;
-import game_engine.material.shader.UVShader;
 import game_engine.material.shader.UnlitShader;
 import game_engine.math.Float2;
 import game_engine.math.Float3;
