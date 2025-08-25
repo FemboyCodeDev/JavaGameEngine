@@ -2,6 +2,7 @@ package game_engine.render;
 
 import game_engine.material.Material;
 import game_engine.material.Texture;
+import game_engine.material.shader.FragmentData;
 import game_engine.math.Float2;
 import game_engine.math.Float3;
 import game_engine.math.Maths;
@@ -46,8 +47,6 @@ public class Camera extends JPanel {
         height = screenHeight;
         depthBuffer = new float[resX][resY];
         renderBuffer = new BufferedImage(resX, resY, BufferedImage.TYPE_INT_RGB);
-
-
     }
 
     @Override
@@ -177,17 +176,17 @@ public class Camera extends JPanel {
                 if (triTest.a) {
                     float depth = 1f / Maths.dotProduct(triTest.b, depths.inverse());
                     if (showOverdraw || (depth < depthBuffer[x][y])) {
-                        Float2 screenUV = new Float2(x / ((float) resX), y / ((float) resY));
-                        Float3 weights = (triWeights[0].scale(triTest.b.x / depths.x)
-                                .add(triWeights[1].scale(triTest.b.y / depths.y))
-                                .add(triWeights[2].scale(triTest.b.z / depths.z))).scale(depth);
-                        Float2 texUV = mat.convertUV(UVs[0].scale(weights.x).add(UVs[1].scale(weights.y)).add(UVs[2].scale(weights.z)));
                         Float3 shaderCol = new Float3(1f, 0f, 1f);
 
                         Shader shader = shaderOverride ? Scene.camera.mat.shader : mat.shader;
                         if (shader != null) {
-                            Texture tex = (mat.tex == null) ? Scene.errorMat.tex : mat.tex;
-                            shaderCol = shader.fragment(tex, texUV, worldNormal, depth, weights, screenUV);
+                            Float2 screenUV = new Float2(x / ((float) resX), y / ((float) resY));
+                            Float3 weights = (triWeights[0].scale(triTest.b.x / depths.x)
+                                    .add(triWeights[1].scale(triTest.b.y / depths.y))
+                                    .add(triWeights[2].scale(triTest.b.z / depths.z))).scale(depth);
+
+                            FragmentData frag = new FragmentData(screenUV, weights, mat, UVs, worldNormal, depth);
+                            shaderCol = shader.fragment(frag);
 
                             if (shaderStatus) {
                                 if (shaderCol.x < 0f) shaderCol = SHADER_DISCARD;

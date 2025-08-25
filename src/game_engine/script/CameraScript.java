@@ -1,6 +1,7 @@
 package game_engine.script;
 
 import game_engine.material.shader.*;
+import game_engine.material.shader.debug.*;
 import game_engine.math.Float2;
 import game_engine.math.Float3;
 import game_engine.math.Maths;
