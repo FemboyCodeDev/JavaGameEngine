@@ -14,6 +14,9 @@ public class Maths {
     public static float tan(double t) {
         return (float) Math.tan(t);
     }
+    public static float atan2(double x, double y) {
+        return (float) Math.atan2(y, x);
+    }
 
     public static int boolToInt(boolean b) {
         return (b ? 1 : 0);
@@ -26,13 +29,6 @@ public class Maths {
         return (float) Math.max(Math.min(max, val), min);
     }
 
-    public static float dotProduct(Float2 u, Float2 v) {
-        return (u.x * v.x) + (u.y * v.y);
-    }
-    public static float dotProduct(Float3 u, Float3 v) {
-        return (u.x * v.x) + (u.y * v.y) + (u.z * v.z);
-    }
-
     public static float lerp(float a, float b, float t) {
         return a * (1f - t) + b * t;
     }
@@ -40,7 +36,7 @@ public class Maths {
     public static float signedTriArea(Float2 a, Float2 b, Float2 c) {
         Float2 ac = c.sub(a);
         Float2 abNormal = b.sub(a).rotate90();
-        return dotProduct(ac, abNormal) / 2f;
+        return ac.dotProduct(abNormal) / 2f;
     }
     public static Pair<Boolean, Float3> pointTriangleTest(Float2 a, Float2 b, Float2 c, Float2 p) {
         float areaABP = signedTriArea(a, b, p);

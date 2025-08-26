@@ -34,24 +34,34 @@ public class Float2 {
     public Float2 sub(Float2 f2) {
         return new Float2(x - f2.x, y - f2.y);
     }
-    public Float2 scale(double s) {
-        return new Float2((float) (x * s), (float) (y * s));
-    }
     public Float2 multiply(Float2 f2) {
         return new Float2(x * f2.x, y * f2.y);
     }
-    public Float2 inverse() {
-        return new Float2(1 / x, 1 / y);
+    public Float2 scale(double s) {
+        return new Float2((float) (x * s), (float) (y * s));
     }
     public Float2 modulo(float v) {
         return new Float2(x % v, y % v);
+    }
+    public Float2 inverse() {
+        return new Float2(1 / x, 1 / y);
     }
     public Float2 normalize() {
         double length = this.length();
         return (length == 0d) ? new Float2() : this.scale(1 / length);
     }
+
     public Float2 lerp(Float2 f2, float t) {
         return this.scale(1f - t).add(f2.scale(t));
+    }
+    public float angle() {
+        return Maths.atan2(x, y);
+    }
+    public float angleBetween(Float2 f2) {
+        return (float) ((this.angle() - f2.angle()) % Math.TAU);
+    }
+    public float dotProduct(Float2 f2) {
+        return (x * f2.x) + (y * f2.y);
     }
 
     public Float3 to3D() {

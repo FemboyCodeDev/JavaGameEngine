@@ -40,24 +40,28 @@ public class Float3 {
     public Float3 sub(Float3 f3) {
         return new Float3(x - f3.x, y - f3.y, z - f3.z);
     }
-    public Float3 scale(double s) {
-        return new Float3((float) (x * s), (float) (y * s), (float) (z * s));
-    }
     public Float3 multiply(Float3 f3) {
         return new Float3(x * f3.x, y * f3.y, z * f3.z);
     }
-    public Float3 inverse() {
-        return new Float3(1 / x, 1 / y, 1 / z);
+    public Float3 scale(double s) {
+        return new Float3((float) (x * s), (float) (y * s), (float) (z * s));
     }
     public Float3 modulo(float v) {
         return new Float3(x % v, y % v, z % v);
+    }
+    public Float3 inverse() {
+        return new Float3(1 / x, 1 / y, 1 / z);
     }
     public Float3 normalize() {
         double length = this.length();
         return (length == 0d) ? new Float3() : this.scale(length);
     }
+
     public Float3 lerp(Float3 f3, float t) {
         return this.scale(1f - t).add(f3.scale(t));
+    }
+    public float dotProduct(Float3 f3) {
+        return (x * f3.x) + (y * f3.y) + (z * f3.z);
     }
 
     public Float2 to2D() {

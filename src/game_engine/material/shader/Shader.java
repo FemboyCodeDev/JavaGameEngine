@@ -10,7 +10,7 @@ public abstract class Shader {
     public abstract Float3 fragment(FragmentData f);
 
     protected static float calculateLightIntensity(Float3 normal) {
-        float intensity = (Maths.dotProduct(normal, Scene.dirToSun) + 1f) * .5f;
+        float intensity = (normal.dotProduct(Scene.dirToSun) + 1f) * .5f;
         return Maths.lerp(intensity, 1f, Scene.envLight);
     }
 }

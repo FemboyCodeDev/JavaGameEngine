@@ -97,7 +97,7 @@ public class Camera extends JPanel {
     private static void renderTriangle(Float3[] tri, Float3 worldNormal, Float2[] UVs, Material mat, int oi, int ti) {
         Float3[] vectors = Maths.getInverseBasisVectors(Scene.camera.transform);
         Float3 viewNormal = Maths.rotate(worldNormal, vectors[0], vectors[1], vectors[2]);
-        boolean facingCam = (Maths.dotProduct(viewNormal, tri[0]) < 0f);
+        boolean facingCam = (viewNormal.dotProduct(tri[0]) < 0f);
 
         if (facingCam) {
             boolean clipA = (tri[0].z <= NEAR_CLIP_DST);
@@ -174,7 +174,7 @@ public class Camera extends JPanel {
                 Float2 p = new Float2(x, y);
                 Pair<Boolean, Float3> triTest = Maths.pointTriangleTest(a, b, c, p);
                 if (triTest.a) {
-                    float depth = 1 / Maths.dotProduct(triTest.b, depths.inverse());
+                    float depth = 1 / triTest.b.dotProduct(depths.inverse());
                     if (showOverdraw || (depth < depthBuffer[x][y])) {
                         Float3 shaderCol = new Float3(1f, 0f, 1f);
 
