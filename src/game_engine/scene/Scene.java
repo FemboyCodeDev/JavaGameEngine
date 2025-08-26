@@ -60,8 +60,14 @@ public abstract class Scene {
     public static GameObject getObject(String name) {
         return objects.get(name);
     }
+    public static GameObject getObject(int index) {
+        return getObjects()[index];
+    }
     public static GameObject[] getObjects() {
         return objects.values().toArray(new GameObject[0]);
+    }
+    public static int objectCount() {
+        return objects.size();
     }
 
     public static void initializeScene() {

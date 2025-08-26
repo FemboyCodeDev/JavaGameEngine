@@ -5,7 +5,6 @@ import game_engine.math.Float2;
 import game_engine.math.Float3;
 import game_engine.math.Maths;
 import game_engine.script.Script;
-import game_engine.material.shader.Shader;
 
 public class GameObject {
     public Transform transform;

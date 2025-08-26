@@ -15,25 +15,25 @@ public class FragmentData {
     public Texture tex;
     public Float3 worldNormal;
     public float depth;
+    public int object;
+    public int triangle;
+    public Float3 worldPos;
 
-    public FragmentData() {
-        this.screenUV = new Float2();
-        this.weights = new Float3();
-        this.mat = new Material();
-        this.triUVs = new Float2[3];
-        this.texUV = new Float2();
-        this.tex = Scene.errorMat.tex;
-        this.worldNormal = new Float3();
-        this.depth = Float.MAX_VALUE;
-    }
-    public FragmentData(Float2 screenUV, Float3 weights, Material mat, Float2[] UVs, Float3 worldNormal, float depth) {
+    public FragmentData(Float2 screenUV, Float3 weights, Material mat, Float2[] UVs, Float3 worldNormal, float depth, int oi, int ti) {
         this.screenUV = screenUV;
         this.weights = weights;
+
         this.mat = mat;
         this.triUVs = UVs;
         this.texUV = mat.convertUV(UVs[0].scale(weights.x).add(UVs[1].scale(weights.y)).add(UVs[2].scale(weights.z)));
         this.tex = (mat.tex == null) ? Scene.errorMat.tex : mat.tex;
+
         this.worldNormal = worldNormal;
         this.depth = depth;
+
+        this.object = oi;
+        this.triangle = ti;
+        Float3[] tri = Scene.getObject(oi).getTriVertexes(ti);
+        this.worldPos = tri[0].scale(weights.x).add(tri[1].scale(weights.y)).add(tri[2].scale(weights.z));
     }
 }

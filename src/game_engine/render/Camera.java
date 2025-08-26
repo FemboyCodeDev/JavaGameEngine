@@ -1,7 +1,6 @@
 package game_engine.render;
 
 import game_engine.material.Material;
-import game_engine.material.Texture;
 import game_engine.material.shader.FragmentData;
 import game_engine.math.Float2;
 import game_engine.math.Float3;
@@ -65,9 +64,10 @@ public class Camera extends JPanel {
         Script.updateDeltaTime();
         Scene.updateCamera();
 
-        for (GameObject object : Scene.getObjects()) {
+        for (int o = 0; o < Scene.objectCount(); o++) {
+            GameObject object = Scene.getObject(o);
             object.updateScript();
-            renderObject(object);
+            renderObject(object, o);
         }
 
         Input.updateInput();
@@ -84,17 +84,17 @@ public class Camera extends JPanel {
         }
     }
 
-    private static void renderObject(GameObject object) {
+    private static void renderObject(GameObject object, int objectIndex) {
         for (int t = 0; t < object.triangleCount(); t++) {
             Float2[] UVs = object.getTriUVs(t);
             Float3 worldNormal = object.getTriNormal(t);
             Float3[] tri = Maths.triToView(object.getTriVertexes(t), Scene.camera.transform);
             Material mat = object.mat;
-            renderTriangle(tri, worldNormal, UVs, (mat == null) ? Scene.errorMat : mat);
+            renderTriangle(tri, worldNormal, UVs, (mat == null) ? Scene.errorMat : mat, objectIndex, t);
         }
     }
 
-    private static void renderTriangle(Float3[] tri, Float3 worldNormal, Float2[] UVs, Material mat) {
+    private static void renderTriangle(Float3[] tri, Float3 worldNormal, Float2[] UVs, Material mat, int oi, int ti) {
         Float3[] vectors = Maths.getInverseBasisVectors(Scene.camera.transform);
         Float3 viewNormal = Maths.rotate(worldNormal, vectors[0], vectors[1], vectors[2]);
         boolean facingCam = (Maths.dotProduct(viewNormal, tri[0]) < 0f);
@@ -107,7 +107,7 @@ public class Camera extends JPanel {
 
             switch (clipCount) {
                 case 0:
-                    drawTriangle(triToScreen(tri), STANDARD_WEIGHTS, worldNormal, UVs, mat);
+                    drawTriangle(triToScreen(tri), STANDARD_WEIGHTS, worldNormal, UVs, mat, oi, ti);
                     break;
                 case 1:
                     int clipIndex = (clipA ? 0 : (clipB ? 1 : 2));
@@ -127,8 +127,8 @@ public class Camera extends JPanel {
                     Float3[] weights1 = new Float3[]{STANDARD_WEIGHTS[nextI], STANDARD_WEIGHTS[prevI], weightB};
                     Float3[] weights2 = new Float3[]{STANDARD_WEIGHTS[nextI], weightA, weightB};
 
-                    drawTriangle(triToScreen(A, B, clipPointB), weights1, worldNormal, UVs, mat);
-                    drawTriangle(triToScreen(A, clipPointA, clipPointB), weights2, worldNormal, UVs, mat);
+                    drawTriangle(triToScreen(A, B, clipPointB), weights1, worldNormal, UVs, mat, oi, ti);
+                    drawTriangle(triToScreen(A, clipPointA, clipPointB), weights2, worldNormal, UVs, mat, oi, ti);
                     break;
                 case 2:
                     int nonClipI = ((!clipA) ? 0 : ((!clipB) ? 1 : 2));
@@ -147,14 +147,14 @@ public class Camera extends JPanel {
                     Float3 weightY = STANDARD_WEIGHTS[nonClipI].lerp(STANDARD_WEIGHTS[clipIB], fracY);
                     Float3[] weights = new Float3[]{STANDARD_WEIGHTS[nonClipI], weightX, weightY};
 
-                    drawTriangle(triToScreen(P, clipPointX, clipPointY), weights, worldNormal, UVs, mat);
+                    drawTriangle(triToScreen(P, clipPointX, clipPointY), weights, worldNormal, UVs, mat, oi, ti);
                     break;
                 default:
                     break;
             }
         }
     }
-    private static void drawTriangle(Float3[] tri, Float3[] triWeights, Float3 worldNormal, Float2[] UVs, Material mat) {
+    private static void drawTriangle(Float3[] tri, Float3[] triWeights, Float3 worldNormal, Float2[] UVs, Material mat, int oi, int ti) {
         Float2 a = tri[0].to2D();
         Float2 b = tri[1].to2D();
         Float2 c = tri[2].to2D();
@@ -174,7 +174,7 @@ public class Camera extends JPanel {
                 Float2 p = new Float2(x, y);
                 Pair<Boolean, Float3> triTest = Maths.pointTriangleTest(a, b, c, p);
                 if (triTest.a) {
-                    float depth = 1f / Maths.dotProduct(triTest.b, depths.inverse());
+                    float depth = 1 / Maths.dotProduct(triTest.b, depths.inverse());
                     if (showOverdraw || (depth < depthBuffer[x][y])) {
                         Float3 shaderCol = new Float3(1f, 0f, 1f);
 
@@ -185,7 +185,7 @@ public class Camera extends JPanel {
                                     .add(triWeights[1].scale(triTest.b.y / depths.y))
                                     .add(triWeights[2].scale(triTest.b.z / depths.z))).scale(depth);
 
-                            FragmentData frag = new FragmentData(screenUV, weights, mat, UVs, worldNormal, depth);
+                            FragmentData frag = new FragmentData(screenUV, weights, mat, UVs, worldNormal, depth, oi, ti);
                             shaderCol = shader.fragment(frag);
 
                             if (shaderStatus) {
