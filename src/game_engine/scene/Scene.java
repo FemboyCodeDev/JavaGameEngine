@@ -45,6 +45,13 @@ public abstract class Scene {
     public static void addModel(String key, Model model) {
         models.put(key, model);
     }
+    public static void replaceModel(String key, Model model) {
+        removeModel(key);
+        addModel(key, model);
+    }
+    public static void removeModel(String key) {
+        models.remove(key);
+    }
     public static Model getModel(String key) {
         Model model = models.get(key);
         if (model == null) {
@@ -55,7 +62,11 @@ public abstract class Scene {
 
     private static final Map<String, GameObject> objects = new HashMap<>();
     public static void add(String name, GameObject object) {
+        object.name = name;
         objects.put(name, object);
+    }
+    public static void delete(String name) {
+        objects.remove(name);
     }
     public static GameObject getObject(String name) {
         return objects.get(name);

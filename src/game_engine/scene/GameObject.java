@@ -7,6 +7,7 @@ import game_engine.math.Maths;
 import game_engine.script.Script;
 
 public class GameObject {
+    public String name;
     public Transform transform;
     public Material mat;
     public Script script;
