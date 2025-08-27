@@ -7,17 +7,36 @@ import game_engine.math.Maths;
 import game_engine.script.Script;
 
 public class GameObject {
+    public boolean active;
     public String name;
     public Transform transform;
     public Material mat;
     public Script script;
-    private final String modelKey;
-    public GameObject(String modelKey, float x, float y, float z, float pitch, float yaw, float roll, float scale, Material material, Script script) {
-        this.transform = new Transform(x, y, z, pitch, yaw, roll, scale);
-        this.mat = material;
+    public String modelKey;
+    public GameObject(String name, String model, float xp, float yp, float zp, float pr, float yr, float rr, float xs, float ys, float zs, Material mat, Script script) {
+        this.active = true;
+        this.name = name;
+        this.modelKey = model;
+        this.transform = new Transform(xp, yp, zp, pr, yr, rr, xs, ys, zs);
+        this.mat = mat;
         this.script = script;
-        this.modelKey = modelKey;
     }
+    public GameObject(String name, String model, float xp, float yp, float zp, float pr, float yr, float rr, float s, Material mat, Script script) {
+        this(name, model, xp, yp, zp, pr, yr, rr, s, s, s, mat, script);
+    }
+    public GameObject(String name, String model, float xp, float yp, float zp, float pr, float yr, float rr, Material mat, Script script) {
+        this(name, model, xp, yp, zp, pr, yr, rr, 1f, mat, script);
+    }
+    public GameObject(String name, String model, float xp, float yp, float zp, Material mat, Script script) {
+        this(name, model, xp, yp, zp, 0f, 0f, 0f, mat, script);
+    }
+    public GameObject(String name, String model, Material mat, Script script) {
+        this(name, model, 0f, 0f, 0f, mat, script);
+    }
+    public GameObject(String name) {
+        this(name, "", null, null);
+    }
+
 
     public Model getModel() {
         return Scene.getModel(modelKey);

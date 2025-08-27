@@ -62,14 +62,17 @@ public class Camera extends JPanel {
         g.setColor(Color.WHITE);
 
         Script.updateDeltaTime();
-        Scene.updateCamera();
 
-        for (int o = 0; o < Scene.objectCount(); o++) {
-            GameObject object = Scene.getObject(o);
-            object.updateScript();
-            renderObject(object, o);
+        if (Scene.camera.active) {
+            Scene.updateCamera();
+            for (int o = 0; o < Scene.objectCount(); o++) {
+                GameObject object = Scene.getObject(o);
+                if (object.active) {
+                    object.updateScript();
+                    renderObject(object, o);
+                }
+            }
         }
-
         Input.updateInput();
 
         g.drawImage(renderBuffer.getScaledInstance(width, height, BufferedImage.SCALE_FAST), 0, 0, null);

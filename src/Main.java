@@ -28,18 +28,18 @@ public class Main {
         Material cubeMat = new Material(lit, null, 1f, 1f);
         setupMatTextures(quadMat, cubeMat);
 
-        Scene.camera = new GameObject("", 0f, 1.5f, 0f, 0f, 0f, 0f, 1f, new Material(), new CameraScript());
+        Scene.camera = new GameObject("cam", "", 0f, 1.5f, 0f, new Material(), new CameraScript());
 
         Script rotScript = new RotationScript();
 
-        Scene.add("floor", new GameObject("quad", 0f, 0f, 10f, -90f, 0f, 0f, 8f, quadMat, null));
-        Scene.add("cubeRot", new GameObject("cube", 0f, 5f, 10f, 0f, 0f, 0f, 1.5f, cubeMat, rotScript));
-        Scene.add("cube01", new GameObject("cube", 0f, .5f, 10f, 0f, 0f, 0f, .5f, cubeMat, null));
-        Scene.add("cube02", new GameObject("cube", 5f, 2f, 15f, 0f, 60f, 0f, 2f, cubeMat, null));
-        Scene.add("cube03", new GameObject("cube", -5f, 1.6f, 15f, 0f, -30f, 0f, 1.6f, cubeMat, null));
-        Scene.add("cube04", new GameObject("cube", 5f, 1.2f, 5f, 0f, 45f, 0f, 1.2f, cubeMat, null));
-        Scene.add("cube05", new GameObject("cube", -5f, .8f, 5f, 0f, -20f, 0f, .8f, cubeMat, null));
-        Scene.add("error", new GameObject("", 0f, 1.5f, 15f, 0f, 0f, 0f, 1f, null, null));
+        Scene.add(new GameObject("floor", "quad", 0f, 0f, 10f, -90f, 0f, 0f, 8f, quadMat, null));
+        Scene.add(new GameObject("cubeRot", "cube", 0f, 5f, 10f, 0f, 0f, 0f, 1.5f, cubeMat, rotScript));
+        Scene.add(new GameObject("cube01", "cube", 0f, .3f, 10f, 0f, 0f, 0f, .5f, .3f, .5f, cubeMat, null));
+        Scene.add(new GameObject("cube02", "cube", 5f, 2f, 15f, 0f, 60f, 0f, 2f, cubeMat, null));
+        Scene.add(new GameObject("cube03", "cube", -5f, 1.6f, 15f, 0f, -30f, 0f, 1.6f, cubeMat, null));
+        Scene.add(new GameObject("cube04", "cube", 5f, 1.2f, 5f, 0f, 45f, 0f, 1.2f, cubeMat, null));
+        Scene.add(new GameObject("cube05", "cube", -5f, .8f, 5f, 0f, -20f, 0f, .8f, cubeMat, null));
+        Scene.add(new GameObject("error", "", 0f, 1.5f, 15f, null, null));
     }
     private static void setupMatTextures(Material quad, Material cube) {
         Texture quadTex = new Texture(16, 16);

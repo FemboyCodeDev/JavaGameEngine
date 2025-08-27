@@ -123,7 +123,7 @@ public class Maths {
     }
 
     public static Float3 transform(Float3 f3, Transform transform) {
-        return rotate(f3.scale(transform.scale), transform).add(transform.pos);
+        return rotate(f3.multiply(transform.scale), transform).add(transform.pos);
     }
     public static Float3[] transformTri(Float3[] tri, Transform transform) {
         Float3 A = transform(tri[0], transform);

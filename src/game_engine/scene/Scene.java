@@ -61,9 +61,8 @@ public abstract class Scene {
     }
 
     private static final Map<String, GameObject> objects = new HashMap<>();
-    public static void add(String name, GameObject object) {
-        object.name = name;
-        objects.put(name, object);
+    public static void add(GameObject object) {
+        objects.put(object.name, object);
     }
     public static void delete(String name) {
         objects.remove(name);

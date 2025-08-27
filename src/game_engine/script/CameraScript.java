@@ -39,7 +39,15 @@ public class CameraScript extends Script {
 
         if (Input.keyDown(KeyEvent.VK_E)) {
             Camera.shaderOverride = !Camera.shaderOverride;
-        } else if (Input.keyDown(KeyEvent.VK_1)) {
+        }
+        if (Input.keyDown(KeyEvent.VK_Q)) {
+            Camera.showOverdraw = !Camera.showOverdraw;
+        }
+        if (Input.keyDown(KeyEvent.VK_F)) {
+            Camera.shaderStatus = !Camera.shaderStatus;
+        }
+
+        if (Input.keyDown(KeyEvent.VK_1)) {
             Scene.camera.mat.shader = new UnlitShader();
         } else if (Input.keyDown(KeyEvent.VK_2)) {
             Scene.camera.mat.shader = new WireframeShader();
@@ -53,14 +61,6 @@ public class CameraScript extends Script {
             Scene.camera.mat.shader = new NormalsShader();
         } else if (Input.keyDown(KeyEvent.VK_7)) {
             Scene.camera.mat.shader = new DebugShader();
-        }
-
-        if (Input.keyDown(KeyEvent.VK_Q)) {
-            Camera.showOverdraw = !Camera.showOverdraw;
-        }
-
-        if (Input.keyDown(KeyEvent.VK_F)) {
-            Camera.shaderStatus = !Camera.shaderStatus;
         }
     }
 }

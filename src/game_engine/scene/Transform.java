@@ -7,12 +7,12 @@ public class Transform {
     public Float3 pos;
     public Float3 rot;
     public Float3[] basisVectors;
-    public float scale;
+    public Float3 scale;
 
-    public Transform(float x, float y, float z, float pitch, float yaw, float roll, float scale) {
-        this.pos = new Float3(x, y, z);
-        this.rot = new Float3(pitch, yaw, roll);
-        this.scale = scale;
+    public Transform(float xp, float yp, float zp, float pr, float yr, float rr, float xs, float ys, float zs) {
+        this.pos = new Float3(xp, yp, zp);
+        this.rot = new Float3(pr, yr, rr);
+        this.scale = new Float3(xs, ys, zs);
         updateRotation();
     }
 
