@@ -5,7 +5,6 @@ import game_engine.material.shader.FragmentData;
 import game_engine.math.Float2;
 import game_engine.math.Float3;
 import game_engine.math.Maths;
-import game_engine.math.Pair;
 import game_engine.scene.GameObject;
 import game_engine.scene.Scene;
 import game_engine.script.Input;
@@ -15,6 +14,7 @@ import game_engine.material.shader.Shader;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
 public class Camera extends JPanel {
@@ -32,75 +32,87 @@ public class Camera extends JPanel {
 
     public static float fov;
     private static int resX;
+    private static float invResX;
     private static int resY;
+    private static float invResY;
+    private static Float2 screenRes;
     private static int width;
     private static int height;
-    private static float[][] depthBuffer;
-    private static BufferedImage renderBuffer;
+    private static float[] depthBuffer;
+    private static BufferedImage renderedImage;
+    private static int[] colorBuffer;
 
     public Camera(float camFov, int resolutionX, int resolutionY, int screenWidth, int screenHeight) {
         fov = camFov;
+
         resX = resolutionX;
+        invResX = 1f / resX;
         resY = resolutionY;
+        invResY = 1f / resY;
+        screenRes = new Float2(resX, resY);
+
         width = screenWidth;
         height = screenHeight;
-        depthBuffer = new float[resX][resY];
-        renderBuffer = new BufferedImage(resX, resY, BufferedImage.TYPE_INT_RGB);
+
+        depthBuffer = new float[resX * resY];
+        renderedImage = new BufferedImage(resX, resY, BufferedImage.TYPE_INT_RGB);
+        colorBuffer = ((DataBufferInt) renderedImage.getRaster().getDataBuffer()).getData();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setColor(Color.white);
 
-        renderBuffer.setRGB(0, 0, resX, resY, new int[resX * resY], 0, resX);
-        depthBuffer = new float[resX][resY];
-        for (int i = 0; i < depthBuffer.length; i++) {
-            float[] filler = new float[depthBuffer[i].length];
-            Arrays.fill(filler, Float.MAX_VALUE);
-            depthBuffer[i] = filler;
-        }
-        g.setColor(Color.WHITE);
+        Arrays.fill(colorBuffer, 0x000000);
+        Arrays.fill(depthBuffer, Float.MAX_VALUE);
 
         Script.updateDeltaTime();
 
         if (Scene.camera.active) {
+            float screenHeightWorld = (float) (2f * Math.tan(fov * Maths.DEG_TO_RAD / 2f));
+            float zScale = resY / screenHeightWorld;
+
             Scene.updateCamera();
             for (int o = 0; o < Scene.objectCount(); o++) {
                 GameObject object = Scene.getObject(o);
                 if (object.active) {
                     object.updateScript();
-                    renderObject(object, o);
+                    renderObject(object, o, zScale);
                 }
             }
         }
         Input.updateInput();
 
-        g.drawImage(renderBuffer.getScaledInstance(width, height, BufferedImage.SCALE_FAST), 0, 0, null);
-        g.drawString(String.format("fps: %.2f", 1 / Script.deltaTime), 5, 15);
-        g.drawString(String.format("%s%s%s",
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g2.drawImage(renderedImage, 0, 0, width, height, null);
+
+        g2.drawString(String.format("fps: %3.2f | min: %3.2f | max: %3.2f", Script.fps, Script.fpsMin, Script.fpsMax), 5, 15);
+
+        g2.drawString(String.format("%s%s%s",
                 shaderOverride ? "shaderOverride " : "", showOverdraw ? "showOverdraw " : "", shaderStatus ? "shaderStatus " : ""), 5, 30);
         if (shaderOverride) {
-            g.drawString(Scene.camera.mat.shader.getClass().getSimpleName(), 5, 50);
+            g2.drawString(Scene.camera.mat.shader.getClass().getSimpleName(), 5, 50);
         } else if (shaderStatus) {
-            g.drawString("white - regular return", 5, 50);
-            g.drawString("red   - discarded fragment", 5, 65);
+            g2.drawString("white - regular return", 5, 50);
+            g2.drawString("red   - discarded fragment", 5, 65);
         }
     }
 
-    private static void renderObject(GameObject object, int objectIndex) {
+    private static void renderObject(GameObject object, int objectIndex, float zScale) {
         for (int t = 0; t < object.triangleCount(); t++) {
             Float2[] UVs = object.getTriUVs(t);
             Float3 worldNormal = object.getTriNormal(t);
             Float3[] tri = Maths.triToView(object.getTriVertexes(t), Scene.camera.transform);
             Material mat = object.mat;
-            renderTriangle(tri, worldNormal, UVs, (mat == null) ? Scene.errorMat : mat, objectIndex, t);
+            renderTriangle(tri, zScale, worldNormal, UVs, (mat == null) ? Scene.errorMat : mat, objectIndex, t);
         }
     }
 
-    private static void renderTriangle(Float3[] tri, Float3 worldNormal, Float2[] UVs, Material mat, int oi, int ti) {
-        Float3[] vectors = Maths.getInverseBasisVectors(Scene.camera.transform);
-        Float3 viewNormal = Maths.rotate(worldNormal, vectors[0], vectors[1], vectors[2]);
-        boolean facingCam = (viewNormal.dotProduct(tri[0]) < 0f);
+    private static void renderTriangle(Float3[] tri, float zScale, Float3 worldNormal, Float2[] UVs, Material mat, int oi, int ti) {
+        Float3[] vectors = Scene.camera.transform.invBasisVectors;
+        boolean facingCam = (Maths.rotate(worldNormal, vectors[0], vectors[1], vectors[2]).dotProduct(tri[0]) < 0f);
 
         if (facingCam) {
             boolean clipA = (tri[0].z <= NEAR_CLIP_DST);
@@ -110,7 +122,7 @@ public class Camera extends JPanel {
 
             switch (clipCount) {
                 case 0:
-                    drawTriangle(triToScreen(tri), STANDARD_WEIGHTS, worldNormal, UVs, mat, oi, ti);
+                    drawTriangle(triToScreen(tri, zScale), STANDARD_WEIGHTS, worldNormal, UVs, mat, oi, ti);
                     break;
                 case 1:
                     int clipIndex = (clipA ? 0 : (clipB ? 1 : 2));
@@ -130,8 +142,8 @@ public class Camera extends JPanel {
                     Float3[] weights1 = new Float3[]{STANDARD_WEIGHTS[nextI], STANDARD_WEIGHTS[prevI], weightB};
                     Float3[] weights2 = new Float3[]{STANDARD_WEIGHTS[nextI], weightA, weightB};
 
-                    drawTriangle(triToScreen(A, B, clipPointB), weights1, worldNormal, UVs, mat, oi, ti);
-                    drawTriangle(triToScreen(A, clipPointA, clipPointB), weights2, worldNormal, UVs, mat, oi, ti);
+                    drawTriangle(triToScreen(A, B, clipPointB, zScale), weights1, worldNormal, UVs, mat, oi, ti);
+                    drawTriangle(triToScreen(A, clipPointA, clipPointB, zScale), weights2, worldNormal, UVs, mat, oi, ti);
                     break;
                 case 2:
                     int nonClipI = ((!clipA) ? 0 : ((!clipB) ? 1 : 2));
@@ -150,7 +162,7 @@ public class Camera extends JPanel {
                     Float3 weightY = STANDARD_WEIGHTS[nonClipI].lerp(STANDARD_WEIGHTS[clipIB], fracY);
                     Float3[] weights = new Float3[]{STANDARD_WEIGHTS[nonClipI], weightX, weightY};
 
-                    drawTriangle(triToScreen(P, clipPointX, clipPointY), weights, worldNormal, UVs, mat, oi, ti);
+                    drawTriangle(triToScreen(P, clipPointX, clipPointY, zScale), weights, worldNormal, UVs, mat, oi, ti);
                     break;
                 default:
                     break;
@@ -161,7 +173,7 @@ public class Camera extends JPanel {
         Float2 a = tri[0].to2D();
         Float2 b = tri[1].to2D();
         Float2 c = tri[2].to2D();
-        Float3 depths = new Float3(tri[0].z, tri[1].z, tri[2].z);
+        Float3 invDepths = new Float3(tri[0].z, tri[1].z, tri[2].z).inverse();
 
         float minX = Math.min(Math.min(a.x, b.x), c.x);
         float minY = Math.min(Math.min(a.y, b.y), c.y);
@@ -169,27 +181,25 @@ public class Camera extends JPanel {
         float maxY = Math.max(Math.max(a.y, b.y), c.y);
         int startX = Maths.clamp(0, resX - 1, (int) minX);
         int startY = Maths.clamp(0, resY - 1, (int) minY);
-        int endX = Maths.clamp(0, resX - 1, (int) maxX);
-        int endY = Maths.clamp(0, resY - 1, (int) maxY);
+        int endX = Maths.clamp(0, resX, (int) Math.ceil(maxX));
+        int endY = Maths.clamp(0, resY, (int) Math.ceil(maxY));
 
         for (int y = startY; y < endY; y++) {
             for (int x = startX; x < endX; x++) {
-                Float2 p = new Float2(x, y);
-                Pair<Boolean, Float3> triTest = Maths.pointTriangleTest(a, b, c, p);
-                if (triTest.a) {
-                    float depth = 1 / triTest.b.dotProduct(depths.inverse());
-                    if (showOverdraw || (depth < depthBuffer[x][y])) {
+                Float3 bary = new Float3();
+                if (Maths.pointTriangleTest(a, b, c, new Float2(x, y), bary)) {
+                    float depth = 1f / bary.dotProduct(invDepths);
+                    if (showOverdraw || (depth < getDepth(x, y))) {
                         Float3 shaderCol = new Float3(1f, 0f, 1f);
 
                         Shader shader = shaderOverride ? Scene.camera.mat.shader : mat.shader;
                         if (shader != null) {
-                            Float2 screenUV = new Float2(x / ((float) resX), y / ((float) resY));
-                            Float3 weights = (triWeights[0].scale(triTest.b.x / depths.x)
-                                    .add(triWeights[1].scale(triTest.b.y / depths.y))
-                                    .add(triWeights[2].scale(triTest.b.z / depths.z))).scale(depth);
+                            Float2 screenUV = new Float2(x * invResX, y * invResY);
+                            Float3 weights = (triWeights[0].scale(bary.x * invDepths.x)
+                                    .add(triWeights[1].scale(bary.y * invDepths.y))
+                                    .add(triWeights[2].scale(bary.z * invDepths.z))).scale(depth);
 
-                            FragmentData frag = new FragmentData(screenUV, weights, mat, UVs, worldNormal, depth, oi, ti);
-                            shaderCol = shader.fragment(frag);
+                            shaderCol = shader.fragment(new FragmentData(screenUV, weights, mat, UVs, worldNormal, depth, oi, ti));
 
                             if (shaderStatus) {
                                 if (shaderCol.x < 0f) shaderCol = SHADER_DISCARD;
@@ -200,26 +210,35 @@ public class Camera extends JPanel {
                         }
 
                         if (showOverdraw) {
-                            depth = depthBuffer[x][y];
+                            depth = getDepth(x, y);
                             if (depth == Float.MAX_VALUE) {
                                 depth = 1f;
                             } else {
                                 depth += 1f;
                             }
                             shaderCol = (depth > OVERDRAW_LIMIT) ? OVER_OVERDRAW_COLOR : (new Float3(depth, depth, depth).scale(1 / OVERDRAW_LIMIT));
-                            }
-                        renderBuffer.setRGB(x, y, shaderCol.getColor());
-                        depthBuffer[x][y] = depth;
+                        }
+                        setRGB(x, y, shaderCol.getColor());
+                        setDepth(x, y, depth);
                     }
                 }
             }
         }
     }
-    private static Float3[] triToScreen(Float3 A, Float3 B, Float3 C) {
-        return Maths.triToScreen(A, B, C, resX, resY, fov);
+    private static Float3[] triToScreen(Float3 A, Float3 B, Float3 C, float zScale) {
+        return Maths.triToScreen(A, B, C, screenRes, zScale);
     }
-    private static Float3[] triToScreen(Float3[] tri) {
-        return Maths.triToScreen(tri[0], tri[1], tri[2], resX, resY, fov);
+    private static Float3[] triToScreen(Float3[] tri, float zScale) {
+        return triToScreen(tri[0], tri[1], tri[2], zScale);
+    }
+    private static float getDepth(int x, int y) {
+        return depthBuffer[(y * resX) + x];
+    }
+    private static void setDepth(int x, int y, float d) {
+        depthBuffer[(y * resX) + x] = d;
+    }
+    private static void setRGB(int x, int y, int color) {
+        colorBuffer[(y * resX) + x] = color;
     }
 
     public void startRendering() {

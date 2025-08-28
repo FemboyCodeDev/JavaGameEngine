@@ -13,6 +13,10 @@ public class Float2 {
         this.y = y;
     }
 
+    public void set(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
     public void offset(float dx, float dy) {
         x += dx;
         y += dy;
@@ -44,18 +48,18 @@ public class Float2 {
         return new Float2(x % v, y % v);
     }
     public Float2 inverse() {
-        return new Float2(1 / x, 1 / y);
+        return new Float2(1f / x, 1f / y);
     }
     public Float2 normalize() {
         double length = this.length();
         return (length == 0d) ? new Float2() : this.scale(1 / length);
     }
 
-    public Float2 lerp(Float2 f2, float t) {
-        return this.scale(1f - t).add(f2.scale(t));
+    public Float2 lerp(Float2 f2, double t) {
+        return this.add(f2.sub(this).scale(t));
     }
     public float angle() {
-        return Maths.atan2(x, y);
+        return (float) Math.atan2(x, y);
     }
     public float angleBetween(Float2 f2) {
         return (float) ((this.angle() - f2.angle()) % Math.TAU);

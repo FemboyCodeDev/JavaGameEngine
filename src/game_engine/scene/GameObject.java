@@ -13,22 +13,22 @@ public class GameObject {
     public Material mat;
     public Script script;
     public String modelKey;
-    public GameObject(String name, String model, float xp, float yp, float zp, float pr, float yr, float rr, float xs, float ys, float zs, Material mat, Script script) {
+    public GameObject(String name, String model, float xP, float yP, float zP, float pR, float yR, float rR, float xS, float yS, float zS, Material mat, Script script) {
         this.active = true;
         this.name = name;
         this.modelKey = model;
-        this.transform = new Transform(xp, yp, zp, pr, yr, rr, xs, ys, zs);
+        this.transform = new Transform(xP, yP, zP, pR, yR, rR, xS, yS, zS);
         this.mat = mat;
         this.script = script;
     }
-    public GameObject(String name, String model, float xp, float yp, float zp, float pr, float yr, float rr, float s, Material mat, Script script) {
-        this(name, model, xp, yp, zp, pr, yr, rr, s, s, s, mat, script);
+    public GameObject(String name, String model, float xP, float yP, float zP, float pR, float yR, float rR, float S, Material mat, Script script) {
+        this(name, model, xP, yP, zP, pR, yR, rR, S, S, S, mat, script);
     }
-    public GameObject(String name, String model, float xp, float yp, float zp, float pr, float yr, float rr, Material mat, Script script) {
-        this(name, model, xp, yp, zp, pr, yr, rr, 1f, mat, script);
+    public GameObject(String name, String model, float xP, float yP, float zP, float pR, float yR, float rR, Material mat, Script script) {
+        this(name, model, xP, yP, zP, pR, yR, rR, 1f, mat, script);
     }
-    public GameObject(String name, String model, float xp, float yp, float zp, Material mat, Script script) {
-        this(name, model, xp, yp, zp, 0f, 0f, 0f, mat, script);
+    public GameObject(String name, String model, float xP, float yP, float zP, Material mat, Script script) {
+        this(name, model, xP, yP, zP, 0f, 0f, 0f, mat, script);
     }
     public GameObject(String name, String model, Material mat, Script script) {
         this(name, model, 0f, 0f, 0f, mat, script);

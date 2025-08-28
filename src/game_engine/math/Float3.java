@@ -21,6 +21,11 @@ public class Float3 {
         this.z = (color & 0x0000ff) / 255f;
     }
 
+    public void set(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
     public void offset(float dx, float dy, float dz) {
         x += dx;
         y += dy;
@@ -50,15 +55,15 @@ public class Float3 {
         return new Float3(x % v, y % v, z % v);
     }
     public Float3 inverse() {
-        return new Float3(1 / x, 1 / y, 1 / z);
+        return new Float3(1f / x, 1f / y, 1f / z);
     }
     public Float3 normalize() {
         double length = this.length();
         return (length == 0d) ? new Float3() : this.scale(length);
     }
 
-    public Float3 lerp(Float3 f3, float t) {
-        return this.scale(1f - t).add(f3.scale(t));
+    public Float3 lerp(Float3 f3, double t) {
+        return this.add(f3.sub(this).scale(t));
     }
     public float dotProduct(Float3 f3) {
         return (x * f3.x) + (y * f3.y) + (z * f3.z);
