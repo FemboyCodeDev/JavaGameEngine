@@ -12,14 +12,18 @@ public class player_phys {
     float friction = 50.0f;
     float accelerate = 300.0f;
     float player_height = 2.0f;
-    float ground_level = 2.0f;
+    float ground_level = 0.0f;
     float air_friction = 10f;
+
+
 
     public void jump(float DeltaTime){
         boolean onGround = camera_pos.y - (player_height / 2.0f) <= ground_level;
         if (onGround){
         PlayerVel.y += jump_strength*DeltaTime;}
     }
+
+
     public void updatePhysics(float DeltaTime) {
         // Constants (you should define these as class fields or final variables)
         float gravity_strength = -9.0f;
@@ -33,6 +37,12 @@ public class player_phys {
 
 
         boolean EnablePhysics = true;
+
+
+        boolean collision = basic_collision.collision(camera_pos);
+
+
+
 
 
         if (EnablePhysics) {

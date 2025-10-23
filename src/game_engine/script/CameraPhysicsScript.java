@@ -52,7 +52,7 @@ public class CameraPhysicsScript extends Script {
 
         transform.pos = physics.camera_pos;
 
-        System.out.println(physics.camera_pos);
+        //System.out.println(physics.camera_pos);
 
 
         if (Input.keyDown(KeyEvent.VK_R)) Camera.fov = 30f;
