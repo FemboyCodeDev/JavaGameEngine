@@ -3,14 +3,16 @@ package game_engine.physics;
 import game_engine.math.Float3;
 
 public class player_phys {
-    Float3 camera_pos = new Float3(0,0,0);
-    Float3 PlayerVel = new Float3(0,0,0);
-    Float3 accel_dir = new Float3(0,0,0); // This comes from keyboard input
+    public static Float3 camera_pos = new Float3(0,0,0);
+    public static Float3 PlayerVel = new Float3(0,0,0);
+    public static Float3 accel_dir = new Float3(0,0,0); // This comes from keyboard input
     public void updatePhysics(float DeltaTime) {
         // Constants (you should define these as class fields or final variables)
         float gravity_strength = -9.0f;
         float jump_strength = 400.0f + 9.0f; // Note: Jump logic is usually in input handling
+        //jump_strength = 0;
         float friction = 10.0f;
+        friction = 50;
         float max_velocity = 1000.0f;
         float accelerate = 300.0f;
         float player_height = 2.0f;
@@ -46,7 +48,7 @@ public class player_phys {
 
             // 3. Movement Acceleration
             // accel_dir is set by keyboard input logic elsewhere
-            accel_dir.normalize(); // Ensure the direction vector is unit length
+            accel_dir = accel_dir.normalize(); // Ensure the direction vector is unit length
 
             float projVel = PlayerVel.dotProduct(accel_dir); // Dot product of current velocity and desired direction
             float accelVel = accelerate * DeltaTime;
@@ -56,20 +58,19 @@ public class player_phys {
             }
 
             // Add the acceleration to the current velocity
-            PlayerVel.add(accel_dir.scale(accelVel));
+            PlayerVel = PlayerVel.add(accel_dir.scale(accelVel));
 
 
             // 4. Gravity
             PlayerVel.y += gravity_strength * DeltaTime;
 
             // 5. Apply Movement
-            camera_pos.add(PlayerVel.scale(DeltaTime));
+            camera_pos = camera_pos.add(PlayerVel.scale(DeltaTime));
 
             // 6. Ground Clamping
             if (camera_pos.y - (player_height / 2.0f) < ground_level) {
                 // Snap position to ground level
                 camera_pos.y = ground_level + (player_height / 2.0f);
-
                 // Stop downward velocity
                 if (PlayerVel.y < 0) {
                     PlayerVel.y = 0;

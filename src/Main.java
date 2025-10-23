@@ -28,7 +28,8 @@ public class Main {
         Material cubeMat = new Material(lit, null, 1f, 1f);
         setupMatTextures(quadMat, cubeMat);
 
-        Scene.camera = new GameObject("cam", "", 0f, 1.5f, 0f, new Material(), new CameraScript());
+        //Scene.camera = new GameObject("cam", "", 0f, 1.5f, 0f, new Material(), new CameraScript());
+        Scene.camera = new GameObject("cam", "", 0f, 1.5f, 0f, new Material(), new CameraPhysicsScript());
 
         Script rotScript = new RotationScript();
 

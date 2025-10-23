@@ -12,12 +12,13 @@ import game_engine.scene.Transform;
 import game_engine.physics.player_phys;
 
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 
 public class CameraPhysicsScript extends Script {
     private static final float MOVE_SPEED = 6f;
     private static final float ROTATION_SPEED = 50f;
 
-    private player_phys physics;
+    private player_phys physics = new player_phys();
 
     @Override
     public void update(GameObject obj) {
@@ -29,10 +30,26 @@ public class CameraPhysicsScript extends Script {
         transform.rot.x = Maths.clamp(-90f, 90f, transform.rot.x);
         transform.updateRotation();
 
+
+        /*
+
         Float2 movement = Input.movementInput();
         Float3[] vectors = Maths.getBasisVectors(new Float3(0f, transform.rot.y, 0f));
         Float3 f3 = vectors[0].scale(movement.x).add(vectors[2].scale(movement.y));
         transform.move(f3.scale(MOVE_SPEED * deltaTime));
+
+
+        */
+        Float2 movement = Input.movementInput();
+        Float3[] vectors = Maths.getBasisVectors(new Float3(0f, transform.rot.y, 0f));
+        Float3 f3 = vectors[0].scale(movement.x).add(vectors[2].scale(movement.y));
+        physics.accel_dir= f3;
+        physics.updatePhysics((float)deltaTime);
+
+        transform.pos = physics.camera_pos;
+
+        System.out.println(physics.camera_pos);
+
 
         if (Input.keyDown(KeyEvent.VK_R)) Camera.fov = 30f;
         else if (Input.keyUp(KeyEvent.VK_R)) Camera.fov = 90f;
