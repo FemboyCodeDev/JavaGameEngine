@@ -51,7 +51,7 @@ public class pmove {
 
 
     }
-
+    double	STOP_EPSILON =0.1;
     int numtouch=0;
     boolean spectator = false;
     Float3 angles = new Float3(0,0,0);
@@ -60,7 +60,34 @@ public class pmove {
 
     Float3 origin = new Float3(0,0,0);
 
-    void NudgePosition (void)
+    int PM_ClipVelocity (Float3 in, Float3 normal, Float3 out, float overbounce)
+    {
+        float	backoff;
+        float	change;
+        int		i, blocked;
+
+        blocked = 0;
+        if (normal.z > 0){
+            blocked |= 1;		// floor
+            }
+        //if (!normal.z){
+          //  blocked |= 2;	}	// step
+
+        //backoff = DotProduct (in, normal) * overbounce;
+        backoff = normal.dotProduct(in)*overbounce;
+        for (i=0 ; i<3 ; i++)
+        {
+            change = normal.getIndex(i)*backoff;
+            out.setIndex(i,in.getIndex(i) - change);
+            if (out.getIndex(i) > -STOP_EPSILON && out.getIndex(i) < STOP_EPSILON)
+                out.setIndex(i,0);
+        }
+
+        return blocked;
+    }
+
+
+    void NudgePosition ()
     {
         Float3	base;
         int		x, y, z;
@@ -89,14 +116,69 @@ public class pmove {
                     this.origin.x = (float)(base.x + (sign.x * 1.0/8));
                     this.origin.y = (float)(base.y + (sign.y * 1.0/8));
                     this.origin.z = (float)(base.z + (sign.z * 1.0/8));
-                    if (PM_TestPlayerPosition (this.origin))
-                        return;
+                    //if (PM_TestPlayerPosition (this.origin))
+                     //   return;
                 }
             }
         }
         origin = base;
 //	Con_DPrintf ("NudgePosition: stuck\n");
     }
+
+    Float3 accelerate = Float3(0,0,0);
+
+    void PM_AirMove (void)
+    {
+        int			i;
+        Float3		wishvel;
+        float		fmove, smove;
+        Float3		wishdir;
+        float		wishspeed;
+
+        fmove = pmove.cmd.forwardmove;
+        smove = pmove.cmd.sidemove;
+
+        forward[2] = 0;
+        right[2] = 0;
+        VectorNormalize (forward);
+        VectorNormalize (right);
+
+        for (i=0 ; i<2 ; i++)
+            wishvel[i] = forward[i]*fmove + right[i]*smove;
+        wishvel[2] = 0;
+
+        VectorCopy (wishvel, wishdir);
+        wishspeed = VectorNormalize(wishdir);
+
+//
+// clamp to server defined max speed
+//
+        if (wishspeed > movevars.maxspeed)
+        {
+            VectorScale (wishvel, movevars.maxspeed/wishspeed, wishvel);
+            wishspeed = movevars.maxspeed;
+        }
+
+//	if (pmove.waterjumptime)
+//		Con_Printf ("am->%f, %f, %f\n", pmove.velocity[0], pmove.velocity[1], pmove.velocity[2]);
+
+        if ( onground != -1)
+        {
+            this.velocity.z = 0;
+            PM_Accelerate (wishdir, wishspeed, this.accelerate);
+            pmove.velocity.z -= movevars.entgravity * movevars.gravity * frametime;
+            PM_GroundMove ();
+        }
+        else
+        {	// not on ground, so little effect on velocity
+            PM_AirAccelerate (wishdir, wishspeed, movevars.accelerate);
+
+            // add gravity
+            pmove.velocity[2] -= movevars.entgravity * movevars.gravity * frametime;
+
+            PM_FlyMove ();
+
+        }
 
 
         /*
@@ -109,37 +191,43 @@ public class pmove {
     were contacted during the move.
     =============
     */
-    public void PlayerMove (float frametime)
+    public void PlayerMove (float frametime,Float3 cmd_angles)
     {
         //frametime = pmove.cmd.msec * 0.001;
         this.numtouch = 0;
 
-        AngleVectors (pmove.angles, forward, right, up);
+        //AngleVectors (this.angles, forward, right, up);
+
 
         if (this.spectator)
         {
-            SpectatorMove ();
+            //SpectatorMove ();
             return;
         }
 
         NudgePosition ();
 
         // take angles directly from command
-        VectorCopy (this.cmd.angles, this.angles);
+
+        //VectorCopy (this.cmd.angles, this.angles);
+
+        this.angles = cmd_angles;
+
+
 
         // set onground, watertype, and waterlevel
-        PM_CatagorizePosition ();
+        //PM_CatagorizePosition ();
 
         if (waterlevel == 2)
-            CheckWaterJump ();
+            //CheckWaterJump ();
 
         if (this.velocity.z < 0)
             this.waterjumptime = 0;
 
         if (pmove.cmd.buttons & BUTTON_JUMP)
             JumpButton ();
-        else
-            pmove.oldbuttons &= ~BUTTON_JUMP;
+        //else
+          //  pmove.oldbuttons &= ~BUTTON_JUMP;
 
         PM_Friction ();
 
