@@ -44,6 +44,10 @@ public class CameraPhysicsScript extends Script {
         Float3[] vectors = Maths.getBasisVectors(new Float3(0f, transform.rot.y, 0f));
         Float3 f3 = vectors[0].scale(movement.x).add(vectors[2].scale(movement.y));
         physics.accel_dir= f3;
+
+        if (Input.keyDown(KeyEvent.VK_SPACE)) physics.jump((float) deltaTime);
+
+
         physics.updatePhysics((float)deltaTime);
 
         transform.pos = physics.camera_pos;
