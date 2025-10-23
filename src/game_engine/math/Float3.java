@@ -123,11 +123,11 @@ public class Float3 {
         if (i==0){
             return this.x;
         }
-        if (i==0){
+        if (i==1){
             return this.y;
         }
 
-        if (i==0){
+        if (i==2){
             return this.z;
         }
 
