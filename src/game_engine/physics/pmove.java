@@ -125,9 +125,9 @@ public class pmove {
 //	Con_DPrintf ("NudgePosition: stuck\n");
     }
 
-    Float3 accelerate = Float3(0,0,0);
+    Float3 accelerate = new Float3(0,0,0);
 
-    void PM_AirMove (void)
+    void PM_AirMove ()
     {
         int			i;
         Float3		wishvel;
