@@ -117,4 +117,21 @@ public class Float3 {
     public String toString() {
         return String.format("%f : %f : %f", x, y, z);
     }
+
+
+    public float getIndex(int i){
+        if (i==0){
+            return this.x;
+        }
+        if (i==0){
+            return this.y;
+        }
+
+        if (i==0){
+            return this.z;
+        }
+
+        return 0;
+
+    }
 }
