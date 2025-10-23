@@ -7,7 +7,8 @@ public class player_phys {
     public static Float3 PlayerVel = new Float3(0,0,0);
     public static Float3 accel_dir = new Float3(0,0,0); // This comes from keyboard input
 
-    float jump_strength = 200.0f + 9.0f; // Note: Jump logic is usually in input handling
+    //float jump_strength = 200.0f + 9.0f; // Note: Jump logic is usually in input handling
+    float jump_strength = 10f; // Note: Jump logic is usually in input handling
     float max_velocity = 1000.0f;
     float friction = 50.0f;
     float accelerate = 300.0f;
@@ -19,8 +20,16 @@ public class player_phys {
 
     public void jump(float DeltaTime){
         boolean onGround = camera_pos.y - (player_height / 2.0f) <= ground_level;
+        if (onGround == false){
+            Float3 feet_check_pos = camera_pos.add(new Float3(0, - (player_height / 2.0f)-0.1f,0));
+            onGround = basic_collision.collision(feet_check_pos);
+            System.out.println(onGround);
+
+
+        }
         if (onGround){
-        PlayerVel.y += jump_strength*DeltaTime;}
+        //PlayerVel.y += jump_strength*DeltaTime;}
+        PlayerVel.y += jump_strength;}
     }
 
 
@@ -41,13 +50,23 @@ public class player_phys {
 
         boolean collision = basic_collision.collision(camera_pos);
 
-
+        if (collision){
+            System.out.println("Collision");
+        }
 
 
 
         if (EnablePhysics) {
             // 1. Ground Check
             boolean onGround = camera_pos.y - (player_height / 2.0f) <= ground_level;
+
+            if (onGround == false){
+                Float3 feet_check_pos = camera_pos.add(new Float3(0, - (player_height / 2.0f)-0.1f,0));
+                onGround = basic_collision.collision(feet_check_pos);
+                System.out.println(onGround);
+
+
+            }
 
             // 2. Friction
             if (onGround) {
@@ -98,10 +117,16 @@ public class player_phys {
 
 
             // 4. Gravity
-            PlayerVel.y += gravity_strength * DeltaTime;
+
+            if (onGround == false){
+            PlayerVel.y += gravity_strength * DeltaTime;}
 
             // 5. Apply Movement
+
+            if (basic_collision.collision(camera_pos.add(PlayerVel.scale(DeltaTime)))==false){
+
             camera_pos = camera_pos.add(PlayerVel.scale(DeltaTime));
+            }
 
             // 6. Ground Clamping
             if (camera_pos.y - (player_height / 2.0f) < ground_level) {

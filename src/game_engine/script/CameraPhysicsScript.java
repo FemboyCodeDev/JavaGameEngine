@@ -50,7 +50,7 @@ public class CameraPhysicsScript extends Script {
 
         physics.updatePhysics((float)deltaTime);
 
-        transform.pos = physics.camera_pos;
+        transform.pos = physics.camera_pos.add(new Float3(0,2,0));
 
         //System.out.println(physics.camera_pos);
 
