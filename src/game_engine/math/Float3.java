@@ -134,4 +134,19 @@ public class Float3 {
         return 0;
 
     }
+
+    public void setIndex(int i,float x){
+        if (i==0){
+            this.x = x;
+        }
+        if (i==1){
+            this.y = x;
+        }
+
+        if (i==2){
+           this.z = x;
+        }
+
+
+    }
 }
