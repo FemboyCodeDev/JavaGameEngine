@@ -14,12 +14,14 @@ public class basic_collision {
 
             if (obj.modelKey == "cube"){
                 Float3 deltapos = pos.sub(obj.transform.pos);
-                deltapos = deltapos.multiply(obj.transform.scale);
+                deltapos = deltapos.multiply(obj.transform.scale.inverse());
 
                 Transform temp_transform = new Transform(0,0,0,0,0,0,0,0,0);
 
                 temp_transform.rot = obj.transform.rot;
                 temp_transform.updateRotation();
+
+
 
                 deltapos = Maths.rotate(deltapos, temp_transform);
                 //System.out.println(deltapos);

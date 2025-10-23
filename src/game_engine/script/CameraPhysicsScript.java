@@ -52,6 +52,8 @@ public class CameraPhysicsScript extends Script {
 
         transform.pos = physics.camera_pos.add(new Float3(0,2,0));
 
+        Scene.getObject("debug_marker").transform.pos =  physics.camera_pos;
+
         //System.out.println(physics.camera_pos);
 
 

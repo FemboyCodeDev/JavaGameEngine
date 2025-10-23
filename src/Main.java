@@ -41,6 +41,9 @@ public class Main {
         Scene.add(new GameObject("cube04", "cube", 5f, 1.2f, 5f, 0f, 45f, 0f, 1.2f, cubeMat, null));
         Scene.add(new GameObject("cube05", "cube", -5f, .8f, 5f, 0f, -20f, 0f, .8f, cubeMat, null));
         Scene.add(new GameObject("error", "", 0f, 1.5f, 15f, null, null));
+
+
+        Scene.add(new GameObject("debug_marker", "debug_marker", 0, 0, 0f, 0f, 0f, 0f, 0.5f, cubeMat, null));
     }
     private static void setupMatTextures(Material quad, Material cube) {
         Texture quadTex = new Texture(16, 16);

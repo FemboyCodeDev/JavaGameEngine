@@ -107,6 +107,9 @@ public abstract class Scene {
                 new Triangle(2, 7, 3, 20, 23, 21, 5), new Triangle(2, 7, 6, 20, 23, 22, 5)};
         Scene.addModel("cube", new Model(cubeV, cubeUVs, cubeN, cubeT));
 
+        Scene.addModel("debug_marker", new Model(cubeV, cubeUVs, cubeN, cubeT));
+
+
         Float3[] cubeInvN = {
                 new Float3(0f, 0f, -1f), new Float3(0f, 0f, 1f),
                 new Float3(-1f, 0f, 0f), new Float3(1f, 0f, 0f),
