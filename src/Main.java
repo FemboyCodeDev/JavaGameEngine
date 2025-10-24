@@ -43,6 +43,10 @@ public class Main {
         Scene.add(new GameObject("error", "", 0f, 1.5f, 15f, null, null));
 
 
+
+        Scene.add(new GameObject("light", "debug_marker", 0f, 10f, 10f, -90f, 0f, 0f, 2f, quadMat, new light_script()));
+
+
         Scene.add(new GameObject("debug_marker", "debug_marker", 0, 0, 0f, 0f, 0f, 0f, 0.5f, cubeMat, null));
 
 
