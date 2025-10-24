@@ -1,10 +1,14 @@
 package game_engine.physics;
 
+import game_engine.math.Float2;
 import game_engine.math.Float3;
 import game_engine.scene.GameObject;
 import game_engine.scene.Scene;
 import game_engine.scene.Model;
 import game_engine.physics.RigidTransform3D;
+
+import static game_engine.physics.RigidTransform3D.apply_transform;
+import static game_engine.physics.RigidTransform3D.rigid_transform_3d;
 
 public class collision {
     public static boolean collision(Float3 pos){
@@ -23,6 +27,17 @@ public class collision {
         if (obj.name != "none"){
             //System.out.println("COLLISION IN UV COLLISION");
             Model model = obj.getModel();
+            int triangles = model.triangleCount();
+            for (int i=0;i<triangles;i++){
+                Float3[] triangle = model.getTriVertexes(i);
+                Float2[] uv = model.getTriUVs(i);
+                Float3[] target = {new Float3(0,0,0),new Float3(10,0,0),new Float3(0,10,0)};
+                double[][] T_calculated = rigid_transform_3d(triangle, target);
+                Float3 newpoint = apply_transform(T_calculated, new Float3[]{pos})[0];
+                System.out.println(newpoint);
+                return;
+
+            }
         }
 
     }
