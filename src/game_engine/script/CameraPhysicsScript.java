@@ -1,5 +1,6 @@
 package game_engine.script;
 
+import game_engine.material.shader.Raycasted_shader;
 import game_engine.material.shader.UnlitShader;
 import game_engine.material.shader.debug.*;
 import game_engine.math.Float2;
@@ -95,5 +96,6 @@ public class CameraPhysicsScript extends Script {
         else if (Input.keyDown(KeyEvent.VK_5)) Scene.camera.mat.shader = new UVShader();
         else if (Input.keyDown(KeyEvent.VK_6)) Scene.camera.mat.shader = new NormalsShader();
         else if (Input.keyDown(KeyEvent.VK_7)) Scene.camera.mat.shader = new DebugShader();
+        else if (Input.keyDown(KeyEvent.VK_8)) Scene.camera.mat.shader = new Raycasted_shader();
     }
 }

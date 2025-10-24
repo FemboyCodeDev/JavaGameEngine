@@ -8,6 +8,7 @@ public class Material {
     public Shader shader;
     public Texture tex;
     public Float2 scale;
+    public int renderData;
     public Material() {
         this.shader = new UnlitShader();
         this.tex = new Texture(2, 2);
@@ -17,6 +18,13 @@ public class Material {
         this.shader = shader;
         this.tex = texture;
         this.scale = new Float2(scaleX, scaleY);
+        this.renderData = 0;
+    }
+    public Material(Shader shader, Texture texture, float scaleX, float scaleY,int renderData) {
+        this.shader = shader;
+        this.tex = texture;
+        this.scale = new Float2(scaleX, scaleY);
+        this.renderData = renderData;
     }
 
     public Float2 convertUV(Float2 uv) {

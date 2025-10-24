@@ -26,6 +26,8 @@ public class Main {
 
         Material quadMat = new Material(lit, null, 2f, 2f);
         Material cubeMat = new Material(lit, null, 1f, 1f);
+
+        Material lightShader = new Material(lit, null, 1f, 1f,1);
         setupMatTextures(quadMat, cubeMat);
 
         //Scene.camera = new GameObject("cam", "", 0f, 1.5f, 0f, new Material(), new CameraScript());
@@ -43,8 +45,8 @@ public class Main {
         Scene.add(new GameObject("error", "", 0f, 1.5f, 15f, null, null));
 
 
-
-        Scene.add(new GameObject("light", "debug_marker", 0f, 10f, 10f, -90f, 0f, 0f, 2f, quadMat, new light_script()));
+        Script lightScript =  new light_script();
+        Scene.add(new GameObject("light", "debug_marker", 0f, 10f, 10f, -90f, 0f, 0f, 2f, cubeMat,lightScript));
 
 
         Scene.add(new GameObject("debug_marker", "debug_marker", 0, 0, 0f, 0f, 0f, 0f, 0.5f, cubeMat, null));
