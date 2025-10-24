@@ -63,15 +63,18 @@ public class CameraPhysicsScript extends Script {
 
         //System.out.println(physics.camera_pos);
 
-        collision.uv_collision(physics.camera_pos);
+
 
         Float3 lookForward = Maths.getBasisVectors(Scene.camera.transform.rot)[2];
 
         raycast_result ray_result = raycast.raycast(transform.pos,lookForward,20);
-        System.out.println(lookForward);
+
+
+        //System.out.println(lookForward);
         if (ray_result.collision){
-            System.out.println("raycast collision");
+            //System.out.println("raycast collision");
             Scene.getObject("raycast_marker").transform.pos =  ray_result.position;
+            collision.uv_collision(ray_result.position);
         }
 
 
