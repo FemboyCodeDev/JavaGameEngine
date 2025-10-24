@@ -10,6 +10,7 @@ import game_engine.scene.GameObject;
 import game_engine.scene.Scene;
 import game_engine.scene.Transform;
 import game_engine.physics.player_phys;
+import game_engine.physics.collision;
 
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -45,6 +46,14 @@ public class CameraPhysicsScript extends Script {
         Float3 f3 = vectors[0].scale(movement.x).add(vectors[2].scale(movement.y));
         physics.accel_dir= f3;
 
+
+
+
+
+
+
+
+
         if (Input.keyDown(KeyEvent.VK_SPACE)) physics.jump((float) deltaTime);
 
 
@@ -55,6 +64,8 @@ public class CameraPhysicsScript extends Script {
         Scene.getObject("debug_marker").transform.pos =  physics.camera_pos;
 
         //System.out.println(physics.camera_pos);
+
+        collision.uv_collision(physics.camera_pos);
 
 
         if (Input.keyDown(KeyEvent.VK_R)) Camera.fov = 30f;
