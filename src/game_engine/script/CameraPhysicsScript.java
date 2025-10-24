@@ -5,12 +5,14 @@ import game_engine.material.shader.debug.*;
 import game_engine.math.Float2;
 import game_engine.math.Float3;
 import game_engine.math.Maths;
+import game_engine.physics.raycast_result;
 import game_engine.render.Camera;
 import game_engine.scene.GameObject;
 import game_engine.scene.Scene;
 import game_engine.scene.Transform;
 import game_engine.physics.player_phys;
 import game_engine.physics.collision;
+import game_engine.physics.raycast;
 
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -50,10 +52,6 @@ public class CameraPhysicsScript extends Script {
 
 
 
-
-
-
-
         if (Input.keyDown(KeyEvent.VK_SPACE)) physics.jump((float) deltaTime);
 
 
@@ -66,6 +64,16 @@ public class CameraPhysicsScript extends Script {
         //System.out.println(physics.camera_pos);
 
         collision.uv_collision(physics.camera_pos);
+
+        Float3 lookForward = Maths.getBasisVectors(Scene.camera.transform.rot)[2];
+
+        raycast_result ray_result = raycast.raycast(transform.pos,lookForward,20);
+        System.out.println(lookForward);
+        if (ray_result.collision){
+            System.out.println("raycast collision");
+            Scene.getObject("raycast_marker").transform.pos =  ray_result.position;
+        }
+
 
 
         if (Input.keyDown(KeyEvent.VK_R)) Camera.fov = 30f;

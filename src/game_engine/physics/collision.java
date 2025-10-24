@@ -19,9 +19,9 @@ public class collision {
 
     public static void uv_collision(Float3 pos){
         GameObject obj = collision_object(pos,2);
-        System.out.println(obj.name);
+        //System.out.println(obj.name);
         if (obj.name != "none"){
-            System.out.println("COLLISION IN UV COLLISION");
+            //System.out.println("COLLISION IN UV COLLISION");
             Model model = obj.getModel();
         }
 

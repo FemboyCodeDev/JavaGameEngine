@@ -44,6 +44,9 @@ public class Main {
 
 
         Scene.add(new GameObject("debug_marker", "debug_marker", 0, 0, 0f, 0f, 0f, 0f, 0.5f, cubeMat, null));
+
+
+        Scene.add(new GameObject("raycast_marker", "debug_marker", 0, 0, 0f, 0f, 0f, 0f, 0.5f, cubeMat, null));
     }
     private static void setupMatTextures(Material quad, Material cube) {
         Texture quadTex = new Texture(16, 16);
