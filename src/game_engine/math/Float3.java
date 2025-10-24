@@ -113,6 +113,13 @@ public class Float3 {
         return ((r << 16) | (g << 8) | b);
     }
 
+    public Float3 crossProduct(Float3 f3) {
+        float newX = this.y * f3.z - this.z * f3.y;
+        float newY = this.z * f3.x - this.x * f3.z;
+        float newZ = this.x * f3.y - this.y * f3.x;
+        return new Float3(newX, newY, newZ);
+    }
+
     @Override
     public String toString() {
         return String.format("%f : %f : %f", x, y, z);
